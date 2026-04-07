@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitai - Elite Master Engine</title>
+    <style>
+        :root { --neon: #00ffcc; --bg: #050505; --card: #111; --gold: #ffcc00; --red: #ff3366; --tip: #0096ff; --level-up: #ff0055; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: white; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        .container { width: 95%; max-width: 550px; padding: 20px; position: relative; }
+
+        #google_translate_element { position: absolute; top: -15px; left: 10px; z-index: 1000; }
+        .goog-te-gadget-simple { background-color: #222 !important; border: 1px solid #444 !important; border-radius: 8px !important; padding: 6px 10px !important; }
+        .goog-te-gadget-simple span { color: white !important; font-size: 12px !important; }
+        .goog-te-gadget-icon, .skiptranslate iframe { display: none !important; }
+
+        h1.logo { color: white; font-size: 42px; text-align: center; margin: 0 0 25px 0; font-weight: 900; letter-spacing: 2px; }
+        h1.logo span { color: var(--neon); }
+        h2 { color: var(--neon); margin: 0 0 15px 0; font-size: 22px; }
+
+        .card { background: var(--card); padding: 30px; border-radius: 25px; border: 1px solid #333; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none; animation: fadeIn 0.4s ease-out; }
+        .card.active { display: block; }
+
+        input, select, textarea { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #000; color: white; font-size: 16px; outline: none; box-sizing: border-box; transition: 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,204,0.2); }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .btn { background: var(--neon); color: black; border: none; padding: 16px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; font-size: 18px; transition: 0.3s; margin-top: 10px; text-decoration: none; display: block; text-align: center; box-sizing: border-box; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,255,204,0.4); }
+
+        .premium-btn { background: linear-gradient(45deg, #ffcc00, #ff9900); color: #000; box-shadow: 0 0 15px rgba(255,204,0,0.4); border: 2px solid #fff; animation: pulseGold 2s infinite; }
+        .whatsapp-btn { background: #25D366; color: white; box-shadow: 0 0 15px rgba(37,211,102,0.4); border: 2px solid #fff; margin-bottom: 20px; }
+        .view-plan-btn { background: var(--gold); color: black; margin-top: 15px; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; display: none; }
+
+        .pass-wrapper { position: relative; }
+        .pass-wrapper input { padding-left: 50px; }
+        .pass-toggle { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 20px; color: #777; padding: 0; width: auto; margin: 0; line-height: 1; }
+
+        .workout-card { background: var(--card); padding: 25px; border-radius: 30px; border: 2px solid var(--neon); position: relative; }
+        .real-time { font-size: 14px; color: var(--neon); margin-bottom: 10px; font-weight: bold; }
+        .day-badge { background: var(--neon); color: black; padding: 6px 16px; border-radius: 20px; font-weight: bold; position: absolute; top: -15px; right: 20px; font-size: 14px; }
+        .level-badge { background: var(--level-up); color: white; padding: 6px 16px; border-radius: 20px; font-weight: bold; position: absolute; top: -15px; left: 20px; font-size: 14px; }
+
+        .daily-tip { background: rgba(0,150,255,0.1); border-right: 4px solid var(--tip); padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 14.5px; line-height: 1.5; color: #eee; }
+        .daily-tip b { color: var(--tip); font-size: 16px; display: block; margin-bottom: 4px; }
+
+        .ex-item { background: #1a1a1a; padding: 18px; border-radius: 12px; margin-bottom: 12px; border-right: 4px solid var(--neon); position: relative; cursor: pointer; transition: 0.2s; text-align: right; }
+        .ex-item:hover { background: #222; transform: scale(1.01); border-right-width: 6px; }
+        .ex-visual-box { width: 90px; height: 90px; background: #000; border: 2px solid var(--neon); border-radius: 15px; position: absolute; left: 12px; top: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .ex-item-visual { padding-left: 115px; min-height: 100px; }
+        .ex-item b { color: var(--neon); display: block; font-size: 1.1em; margin-bottom: 5px; }
+        .ex-item span { color: #bbb; font-size: 0.9em; display: block; }
+        .learning-item { border-right-color: var(--level-up); }
+        .learning-item b { color: var(--level-up); }
+
+        .stage-banner { padding: 12px; border-radius: 10px; margin: 25px 0 10px 0; text-align: center; font-weight: bold; font-size: 17px; }
+        .banner-warmup { background: rgba(255,51,102,0.1); border: 1px solid #ff3366; color: #ff3366; }
+        .banner-core { background: rgba(0,255,204,0.05); border: 1px solid var(--neon); color: var(--neon); }
+        .banner-stretch { background: rgba(0,150,255,0.1); border: 1px solid #0096ff; color: #0096ff; }
+        .banner-sport { background: rgba(255,204,0,0.1); border: 1px solid var(--gold); color: var(--gold); }
+
+        .progress-bar { width: 100%; height: 10px; background: #222; border-radius: 10px; margin-top: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #0096ff, var(--neon)); width: 0%; transition: width 0.5s ease-in-out; }
+
+        .days-selector { display: flex; justify-content: space-between; margin: 15px 0; }
+        .day-check { background: #222; padding: 12px 0; border-radius: 8px; cursor: pointer; flex: 1; text-align: center; border: 1px solid #444; font-weight: bold; transition: 0.2s; margin: 0 3px; font-size: 15px; }
+        .day-check.selected { background: var(--neon); color: black; border-color: white; transform: scale(1.05); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card); border: 2px solid var(--neon); padding: 30px; border-radius: 20px; width: 85%; max-width: 450px; position: relative; max-height: 85vh; overflow-y: auto; text-align: right; }
+        .modal-close { position: absolute; top: 15px; left: 15px; background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+        .modal-title { color: white; margin-top: 0; border-bottom: 2px solid #333; padding-bottom: 15px; font-size: 22px; }
+        .modal-body { color: #ccc; font-size: 15px; line-height: 1.7; margin-top: 15px; }
+
+        .meal-box { background: #1a1a1a; padding: 15px; border-radius: 15px; margin-bottom: 20px; border-right: 4px solid var(--gold); }
+        .meal-box h3 { color: var(--gold); margin: 0 0 12px 0; font-size: 18px; }
+        .meal-box ul { margin: 0; padding-right: 20px; color: #ddd; }
+        .meal-option { background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; border: 1px dashed #444; }
+        .meal-option b { color: var(--neon); font-size: 13px; display: block; margin-bottom: 3px; }
+        .meal-option p { margin: 0; font-size: 14px; color: #ddd; line-height: 1.5; }
+
+        .toggle-link { color: var(--neon); text-align: center; margin-top: 20px; cursor: pointer; text-decoration: underline; font-size: 14px; display: block; }
+        .legal-link { color: var(--level-up); font-weight: bold; text-decoration: underline; cursor: pointer; }
+
+
+        .water-tracker { background: rgba(0,150,255,0.1); border: 1px solid var(--tip); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin: 10px 0 20px 0; }
+        .water-tracker span { font-size: 15px; color: #eee; }
+        .water-tracker b { color: var(--tip); font-size: 18px; }
+        .water-btn { background: var(--tip); color: #000; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 22px; font-weight: bold; cursor: pointer; line-height: 1; transition: 0.2s; }
+        .water-btn:active { transform: scale(0.9); }
+
+        .sport-btn { background: #222; border: 2px solid #444; border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; font-size: 16px; font-weight: bold; color: #ddd; }
+        .sport-btn.active { border-color: var(--gold); background: rgba(255,204,0,0.15); color: var(--gold); transform: scale(1.02); }
+        .sports-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .sports-grid .full-row { grid-column: span 2; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseGold { 0% { box-shadow: 0 0 0 0 rgba(255,204,0,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,204,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,204,0,0); } }
+
+        .human-figure { width: 60px; height: 60px; position: relative; scale: 0.8; }
+        .head { width: 12px; height: 12px; background: #fff; border-radius: 50%; position: absolute; top: 5px; left: 24px; }
+        .torso { width: 4px; height: 25px; background: #fff; position: absolute; top: 17px; left: 28px; border-radius: 2px; }
+        .arm { width: 3px; height: 20px; background: #fff; position: absolute; top: 18px; transform-origin: top center; border-radius: 2px; }
+        .leg { width: 4px; height: 22px; background: #fff; position: absolute; top: 40px; transform-origin: top center; border-radius: 2px; }
+        .arm.left { left: 24px; } .arm.right { left: 32px; }
+        .leg.left { left: 25px; } .leg.right { left: 31px; }
+
+        .warmup-anim { border-color: #ff3366; box-shadow: inset 0 0 10px rgba(255,51,102,0.2); }
+        .warmup-anim .arm.left { animation: warmArm 0.5s infinite alternate; }
+        .warmup-anim .arm.right { animation: warmArm 0.5s infinite alternate-reverse; }
+        .warmup-anim .leg.left { animation: warmLeg 0.5s infinite alternate; }
+        .warmup-anim .leg.right { animation: warmLeg 0.5s infinite alternate-reverse; }
+        @keyframes warmArm { 0% { transform: rotate(-40deg); } 100% { transform: rotate(40deg); } }
+        @keyframes warmLeg { 0% { transform: rotate(20deg); } 100% { transform: rotate(-20deg); } }
+
+        .stretch-toe { border-color: #0096ff; box-shadow: inset 0 0 10px rgba(0,150,255,0.2); }
+        .stretch-toe .torso { animation: bendToe 4s infinite alternate; transform-origin: bottom center; }
+        .stretch-toe .arm { animation: reachToe 4s infinite alternate; transform-origin: top center; }
+        .stretch-toe .head { animation: headToe 4s infinite alternate; }
+        @keyframes bendToe { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(70deg); } }
+        @keyframes reachToe { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(100deg); } }
+        @keyframes headToe { 0%, 20% { top: 5px; left: 24px; } 80%, 100% { top: 25px; left: 40px; } }
+
+        .stretch-quad { border-color: #0096ff; box-shadow: inset 0 0 10px rgba(0,150,255,0.2); }
+        .stretch-quad .leg.right { animation: bendQuad 4s infinite alternate; transform-origin: top center; }
+        .stretch-quad .arm.right { animation: reachQuad 4s infinite alternate; transform-origin: top center; }
+        @keyframes bendQuad { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-90deg); } }
+        @keyframes reachQuad { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-45deg); } }
+
+        .stretch-chest { border-color: #0096ff; box-shadow: inset 0 0 10px rgba(0,150,255,0.2); }
+        .stretch-chest .arm { animation: openChest 4s infinite alternate; transform-origin: top center; }
+        .stretch-chest .torso { animation: puffChest 4s infinite alternate; transform-origin: bottom center; }
+        @keyframes openChest { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-50deg); } }
+        @keyframes puffChest { 0%, 20% { transform: rotate(0deg); } 80%, 100% { transform: rotate(-10deg); } }
+    </style>
+</head>
+<body>
+
+<div id="google_translate_element"></div>
+
+
+
+<div class="container">
+    <h1 class="logo">Fit<span>ai</span></h1>
+
+    <!-- התחברות -->
+    <div id="screen-login" class="card">
+        <h2>התחברות למערכת</h2>
+        <input type="email" id="loginEmail" placeholder="אימייל להתחברות">
+        <div class="pass-wrapper">
+            <input type="password" id="loginPass" placeholder="סיסמה">
+            <button type="button" class="pass-toggle" onclick="togglePass('loginPass', this)">👁️</button>
+        </div>
+        <button type="button" class="btn" onclick="login()">היכנס לחשבון 🚀</button>
+        <span class="toggle-link" onclick="switchCard('screen-register')">משתמש חדש? לחץ כאן ליצירת פרופיל</span>
+    </div>
+
+    <!-- הרשמה -->
+    <div id="screen-register" class="card">
+        <h2>יצירת פרופיל אישי</h2>
+        <input type="email" id="regEmail" placeholder="אימייל">
+        <div class="pass-wrapper">
+            <input type="password" id="regPass" placeholder="בחר סיסמה">
+            <button type="button" class="pass-toggle" onclick="togglePass('regPass', this)">👁️</button>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="regAge" placeholder="גיל">
+            <input type="number" id="regHeight" placeholder="גובה (ס''מ)">
+        </div>
+        <input type="number" id="regWeight" placeholder="משקל נוכחי (ק''ג)">
+        <textarea id="regInjuries" placeholder="האם יש פציעות עבר? אם אין, רשום 'אין'"></textarea>
+        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-top: 15px; border-right: 4px solid var(--level-up);">
+            <label style="display: flex; gap: 10px; font-size: 13px; cursor: pointer; color: #ddd; align-items: center;">
+                <input type="checkbox" id="legalCheck" style="width: 22px; height: 22px; margin: 0;">
+                <span>אני מאשר שקראתי ואני מסכים ל<span class="legal-link" onclick="openModalById('healthModal'); event.preventDefault();">הצהרת הבריאות</span>.</span>
+            </label>
+        </div>
+        <button type="button" class="btn" onclick="goToSetup()">המשך להגדרות התוכנית</button>
+        <span class="toggle-link" onclick="switchCard('screen-login')">חזור למסך התחברות</span>
+    </div>
+
+    <!-- הגדרות -->
+    <div id="screen-setup" class="card">
+        <h2>התאמת עצימות (AI)</h2>
+        <p style="margin: 0 0 5px 0; font-size: 14px; color: var(--neon);">כמה שכיבות סמיכה אתה עושה ברצף?</p>
+        <select id="inPushups">
+            <option value="0-10">0 עד 10</option>
+            <option value="11-20">11 עד 20</option>
+            <option value="21-30">21 עד 30</option>
+            <option value="31+">31 ומעלה (מפלצת)</option>
+        </select>
+        <p style="margin: 10px 0 5px 0; font-size: 14px; color: var(--neon);">כמה עליות מתח אתה עושה ברצף?</p>
+        <select id="inPullups">
+            <option value="0">0 (לא מצליח)</option>
+            <option value="1-4">1 עד 4</option>
+            <option value="5-10">5 עד 10</option>
+            <option value="11+">11 ומעלה (מפלצת)</option>
+        </select>
+        <p style="margin: 15px 0 5px 0; font-size: 14px; color: var(--gold); font-weight:bold;">ציוד וסביבת אימון:</p>
+        <select id="inEquip" style="border-color:var(--gold);">
+            <option value="home">בית / פארק (משקל גוף בלבד)</option>
+            <option value="dumbbells">בית (יש לי זוג משקולות)</option>
+            <option value="gym" selected>חדר כושר מלא (מכשירים + משקולות חופשיות)</option>
+        </select>
+<input type="hidden" id="inGoal" value="mass">
+        <p style="margin: 15px 0 10px 0; font-size: 15px; font-weight:bold; color:var(--gold);">בחר מסלול אימון:</p>
+        <div class="sports-grid">
+            <div class="sport-btn active" onclick="selectSport('mass', this)">💪 מסה וכוח</div>
+            <div class="sport-btn" onclick="selectSport('toning_m', this)">🔥 חיטוב גברים</div>
+            <div class="sport-btn" onclick="selectSport('toning_f', this)">✨ חיטוב נשים</div>
+            <div class="sport-btn" onclick="selectSport('tennis', this)">🎾 טניס</div>
+            <div class="sport-btn" onclick="selectSport('soccer', this)">⚽ כדורגל</div>
+            <div class="sport-btn full-row" onclick="selectSport('basketball', this)">🏀 כדורסל</div>
+        </div>
+        <p style="margin: 10px 0 5px 0; font-size: 14px;">זמן (לא כולל חימום ומתיחות):</p>
+        <select id="inDuration">
+            <option value="30">30 דקות</option>
+            <option value="60" selected>60 דקות</option>
+            <option value="90">90 דקות (PRO)</option>
+        </select>
+        <p style="margin: 15px 0 5px 0; font-size: 14px;">ימי אימון בשבוע:</p>
+        <div class="days-selector">
+            <div class="day-check" onclick="toggleDay(this,0)">א'</div>
+            <div class="day-check" onclick="toggleDay(this,1)">ב'</div>
+            <div class="day-check" onclick="toggleDay(this,2)">ג'</div>
+            <div class="day-check" onclick="toggleDay(this,3)">ד'</div>
+            <div class="day-check" onclick="toggleDay(this,4)">ה'</div>
+            <div class="day-check" onclick="toggleDay(this,5)">ו'</div>
+            <div class="day-check" onclick="toggleDay(this,6)">ש'</div>
+        </div>
+        <span class="toggle-link" onclick="switchCard('screen-register')" style="display:block; margin-top:15px;">⬅️ חזור למסך הרשמה</span>
+        <button type="button" class="btn" onclick="finishRegister()">סיים 💥</button>
+    </div>
+
+    <!-- אפליקציה -->
+    <div id="screen-app" class="card">
+        <div class="workout-card" style="padding-bottom:30px;">
+            <div id="virtualTime" class="real-time"></div>
+            <div class="day-badge" id="dayLabel">יום 1</div>
+            <div class="level-badge" id="levelLabel">רמה 1</div>
+            <h1 id="userHello" style="margin-top: 0;">שלום!</h1>
+            <div class="water-tracker">
+                <span>💧 מים: <b id="waterCount">0</b> / 12 כוסות</span>
+                <button type="button" class="water-btn" onclick="addWater()">+</button>
+            </div>
+            <p id="planInfo" style="color:#aaa; font-size: 0.95em; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;"></p>
+            <button type="button" class="btn premium-btn" id="premiumBtnDisplay" onclick="openModalById('unlockModal')">👑 מחולל תזונה VIP</button>
+            <button type="button" class="btn view-plan-btn" id="viewPlanBtn" onclick="openModalById('nutritionResultModal')">🥗 התפריט שלי</button>
+            <div id="dailyTip" class="daily-tip"></div>
+            <div id="workoutArea"></div>
+
+            <div id="menuCheckArea" style="background:rgba(255,204,0,0.08); border:1px solid var(--gold); padding:15px; border-radius:15px; margin:20px 0; display:flex; align-items:center; gap:12px; cursor:pointer;" onclick="document.getElementById('menuCheckToday').click()">
+                <input type="checkbox" id="menuCheckToday" style="width:25px; height:25px; cursor:pointer;" onclick="event.stopPropagation()">
+                <label for="menuCheckToday" style="cursor:pointer; color:var(--gold); font-weight:bold;">נצמדתי לתפריט היום ב-100% 🥗</label>
+            </div>
+            <span onclick="toggleNoMenu()" id="noMenuLink" style="display:block; text-align:center; font-size:13px; color:#666; text-decoration:underline; cursor:pointer; margin-top:-10px; margin-bottom:15px;">אין לי תפריט</span>
+
+            <div id="workoutCheckArea" style="display:none; background:rgba(0,255,204,0.05); border:1px solid var(--neon); padding:15px; border-radius:15px; margin-bottom:15px; align-items:center; gap:12px; cursor:pointer;" onclick="document.getElementById('workoutCheckToday').click()">
+                <input type="checkbox" id="workoutCheckToday" style="width:25px; height:25px; cursor:pointer; accent-color:var(--neon);" onclick="event.stopPropagation()">
+                <label for="workoutCheckToday" style="cursor:pointer; color:var(--neon); font-weight:bold;">ביצעתי את האימון המלא 🏋️</label>
+            </div>
+
+            <div id="brainTaskArea" style="display:none; background:rgba(255,0,255,0.05); border:1px solid #ff00ff; padding:15px; border-radius:15px; margin-bottom:20px; align-items:center; gap:12px; cursor:pointer;" onclick="document.getElementById('brainCheckToday').click()">
+                <input type="checkbox" id="brainCheckToday" style="width:25px; height:25px; cursor:pointer; accent-color:#ff00ff;" onclick="event.stopPropagation()">
+                <label for="brainCheckToday" style="cursor:pointer; color:#ff00ff; font-weight:bold;">ביצעתי את משימת המוח היומית 🧠</label>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button type="button" onclick="prevDay()" style="background:#222; border:1px solid #444; color:white; padding:14px; border-radius:12px; font-size:16px; cursor:pointer; flex:1;">⬅️ יום קודם</button>
+                <button type="button" class="btn" onclick="completeDay()" style="font-size:18px; margin-top:0; flex:2;">סיימתי יום ✔️</button>
+            </div>
+            <button type="button" onclick="openSettings()" style="background:none; border:1px solid #444; color:#aaa; width:100%; padding:12px; border-radius:12px; cursor:pointer; margin-top:10px; font-size:14px;">⚙️ ערוך הגדרות אימון</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <p id="progressStat" style="font-size:12px; color:#777; text-align:center; margin-top:8px;"></p>
+        <div style="text-align:center; margin-top:30px; border-top: 1px solid #222; padding-top: 15px;">
+            <button type="button" onclick="logoutUser()" style="background:none; border:none; color:#ff5555; font-size:16px; cursor:pointer; font-weight:bold; text-decoration:underline;">⚠️ התנתק ומחק הכל</button>
+        </div>
+    </div>
+</div>
+
+<!-- מודל סיכום שבועי -->
+<div class="modal-overlay" id="sundayModal" style="display:none;">
+    <div class="modal-content" onclick="event.stopPropagation()" style="border-color:var(--gold); text-align:center;">
+        <h2 style="color:var(--gold);">📊 סיכום שבועי Fitai</h2>
+        <div id="weeklyScore" style="width:100px; height:100px; border-radius:50%; border:5px solid var(--neon); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:bold; margin:0 auto 20px; color:var(--neon);">0</div>
+        <div id="weeklyFeedback" style="margin-bottom:20px; font-weight:bold; color:#fff; font-size:16px;"></div>
+        <div style="border-top:1px solid #333; padding-top:20px; text-align:right;">
+            <p style="color:var(--neon); font-weight:bold;">עדכן נתונים גופניים:</p>
+            <label style="font-size:13px; color:#aaa;">משקל נוכחי (ק"ג):</label>
+            <input type="number" id="updateWeight" style="border-color:var(--gold);">
+            <label style="font-size:13px; color:#aaa;">גובה (ס"מ):</label>
+            <input type="number" id="updateHeight" style="border-color:var(--gold);">
+            <label style="font-size:13px; color:#aaa;">גיל:</label>
+            <input type="number" id="updateAge" style="border-color:var(--gold);">
+            <button type="button" class="btn" onclick="saveWeeklyUpdate()" style="margin-top:15px;">שמור והמשך לאימון 🚀</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="healthModal" onclick="closeModal('healthModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal('healthModal')">&times;</button>
+        <h2 class="modal-title" style="color:var(--level-up);">הצהרת בריאות</h2>
+        <div class="modal-body">
+            <p style="color:var(--gold); font-weight:bold; font-size:16px; margin-bottom:15px;">⚠️ חשוב לקרוא לפני השימוש</p>
+
+            <p style="margin-bottom:12px;">🤖 <b>Fitai היא כלי AI בלבד.</b> התוכנית מבוססת על אלגוריתם חכם ואינה מהווה תחליף לאיש מקצוע — מאמן מוסמך, רופא, או תזונאי קליני.</p>
+
+            <p style="margin-bottom:12px;">🏥 <b>אחריות רפואית:</b> לפני תחילת כל תוכנית אימון מומלץ להתייעץ עם רופא, במיוחד אם יש לך מצב בריאותי קיים, פציעה, או שלא התאמנת לאחרונה.</p>
+
+            <p style="margin-bottom:12px;">💪 <b>אחריות אישית:</b> כל אימון ותרגיל מבוצע על אחריותך הבלעדית. אם מרגיש/ה כאב חריג, סחרחורת, או אי נוחות — הפסק/י מיד.</p>
+
+            <p style="margin-bottom:12px;">🥗 <b>תפריט התזונה:</b> הנתונים הקלוריים מחושבים לפי נוסחאות סטנדרטיות (BMR/TDEE) ומיועדים כהנחיה כללית בלבד. אין לבצע שינויים תזונתיים קיצוניים ללא ייעוץ תזונאי.</p>
+
+            <p style="color:#aaa; font-size:13px;">על ידי לחיצה על "הבנתי ומסכים/ה" אתה/את מאשר/ת שקראת והבנת את כל האמור לעיל ומקבל/ת את מלוא האחריות לשימוש באפליקציה.</p>
+
+            <button class="btn" style="margin-top:20px;" onclick="closeModal('healthModal')">הבנתי ומסכים/ה ✅</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="exerciseModal" onclick="closeExModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeExModal()">&times;</button>
+        <h2 class="modal-title" id="modalTitle" style="color:var(--neon);">שם תרגיל</h2>
+        <div class="modal-body" id="modalDesc"></div>
+        <div id="timerBox" style="background:#000; border:1px solid var(--tip); padding:15px; border-radius:12px; text-align:center; margin-top:20px;">
+            <div style="font-size:13px; color:#aaa; margin-bottom:5px;">⏱️ טיימר מנוחה בין סטים</div>
+            <div id="timerDisplay" style="font-size:32px; font-weight:bold; color:var(--tip); font-family:monospace; margin:8px 0;">01:00</div>
+            <button type="button" class="btn" style="background:var(--tip); color:#000; padding:10px; font-size:15px; margin-top:5px;" onclick="startRestTimer()">התחל טיימר ▶️</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="unlockModal" onclick="closeModal('unlockModal')">
+    <div class="modal-content" onclick="event.stopPropagation()" style="border-color:var(--gold); text-align:center;">
+        <button class="modal-close" onclick="closeModal('unlockModal')">&times;</button>
+        <h2 style="color:var(--gold);">🔒 כספת VIP</h2>
+        <p style="font-size:15px; margin-bottom:20px;">שלח הודעה ללופו בוואטסאפ לקבלת קוד הגישה.</p>
+        <a href="https://wa.me/972509344225?text=היי%20לופו,%20אשמח%20לקבל%20את%20קוד%20ה-VIP!" target="_blank" class="btn whatsapp-btn">💬 לחץ לשליחת הודעה ללופו</a>
+        <div style="border-top:1px solid #333; padding-top:20px;">
+            <input type="text" id="vipCodeInput" placeholder="הכנס את הקוד כאן..." style="border-color:var(--gold); text-align:center; font-size:18px; font-weight:bold; letter-spacing:2px;">
+            <button type="button" class="btn premium-btn" onclick="verifyPremiumCode()">אמת קוד ופתח 🔓</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="nutritionSetupModal" onclick="closeModal('nutritionSetupModal')">
+    <div class="modal-content" onclick="event.stopPropagation()" style="border-color:var(--gold);">
+        <button class="modal-close" onclick="closeModal('nutritionSetupModal')">&times;</button>
+        <h2 style="color:var(--gold);">👑 מחולל תפריט AI</h2>
+        <select id="nutDietType"><option value="רגיל">אוכל הכל</option><option value="צמחוני">צמחוני</option><option value="טבעוני">טבעוני</option></select>
+        <select id="nutActivity"><option value="1.2">פעילות נמוכה (משרד)</option><option value="1.55">פעילות בינונית</option><option value="1.9">עבודה פיזית קשה</option></select>
+        <p style="font-size:13px; color:#aaa; margin: 10px 0 3px 0;">אלרגיות / העדפות תזונה (אופציונלי):</p>
+        <textarea id="nutAllergies" placeholder="למשל: צמחוני, טבעוני, ללא גלוטן, אלרגי לביצים, רגיש ללקטוז..."></textarea>
+        <button type="button" class="btn premium-btn" onclick="generateNutritionPlan()">🚀 צור תפריט!</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="nutritionResultModal" onclick="closeModal('nutritionResultModal')">
+    <div class="modal-content" onclick="event.stopPropagation()" style="border-color:var(--gold);">
+        <button class="modal-close" onclick="closeModal('nutritionResultModal')">&times;</button>
+        <h2 style="color:var(--gold);">🥗 התפריט שלך</h2>
+        <div id="nutritionResultBody"></div>
+    </div>
+</div>
+
+
+
+<script>
+
+    // ====== מפתחות קבועים לנצח - לא לשנות! ======
+    var DB_KEY = 'fitai_db_main';
+    var EMAIL_KEY = 'fitai_email_main';
+
+    var currentUser = null;
+    var tDays = [];
+    var weekDays = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
+
+    var dailyTipsArray = [
+        "שתה היום לפחות 3 ליטר מים! השריר זקוק לנוזלים כדי לגדול ולהתאושש. 💧",
+        "שמור על תזונה נקייה - בלי סוכר מעובד היום. 🚫🍬",
+        "הקפד על 7-8 שעות שינה הלילה. הגוף נבנה בשינה, לא באימון. 🛏️",
+        "הוסף מנת חלבון איכותית לכל ארוחה. 🥚",
+        "אכול מנת ירקות גדולה היום - הויטמינים חשובים לספיגת החלבון. 🥗",
+        "אל תוותר לעצמך בסטים האחרונים - שם קורה הקסם! 💪",
+        "הקפד על טכניקה ולא על אגו. משקל נמוך עם טכניקה טובה מנצח. 🧠"
+    ];
+
+    var eliteBrainTasks = [
+        {t: "הנדסה לאחור (Reverse Engineering)", d: "קח אפליקציה מועדפת ופרק בראש איך המתכנתים בנו את הלוגיקה המרכזית שלה. בנה את הארכיטקטורה בראש בלי לכתוב כלום."},
+        {t: "חישוב מתמטי תחת לחץ", d: "קח את המספר 1024 והתחל להחסיר ממנו 7 ברצף מהר ככל האפשר. טעית? מתחילים מהתחלה. מפתח פוקוס פסיכי."},
+        {t: "NSDR (שליטה מנטלית)", d: "שכב 10 דקות בעיניים עצומות. סרוק את הגוף מלמטה למעלה והרפה שרירים. אל תיתן למחשבות לנדוד."}
+    ];
+
+    window.onload = function() {
+        var savedEmail = localStorage.getItem(EMAIL_KEY);
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        if (savedEmail && db[savedEmail]) {
+            currentUser = savedEmail;
+            renderApp();
+            checkSunday();
+        } else {
+            switchCard('screen-login');
+        }
+    };
+
+    function togglePass(inputId, btn) {
+        var input = document.getElementById(inputId);
+        if (input.type === 'password') { input.type = 'text'; btn.innerText = '🙈'; }
+        else { input.type = 'password'; btn.innerText = '👁️'; }
+    }
+
+    function switchCard(id) {
+        document.querySelectorAll('.card').forEach(function(c) { c.classList.remove('active'); });
+        document.getElementById(id).classList.add('active');
+        if (id === 'screen-register') {
+            tDays = [];
+            document.querySelectorAll('.day-check').forEach(function(el) { el.classList.remove('selected'); });
+        }
+    }
+
+    function toggleDay(el, d) {
+        if (tDays.includes(d)) { tDays = tDays.filter(function(x) { return x !== d; }); el.classList.remove('selected'); }
+        else { tDays.push(d); el.classList.add('selected'); }
+    }
+
+
+    function openSettings() {
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        var u = db[currentUser];
+        if (!u) return;
+        // מלא את ערכי ההגדרות הנוכחיות
+        document.getElementById('inEquip').value = u.equip || 'gym';
+        document.getElementById('inGoal').value = u.goal || 'mass';
+        document.getElementById('inDuration').value = u.dur || 60;
+        // סמן את כפתור הספורט הנכון
+        document.querySelectorAll('.sport-btn').forEach(function(btn) { btn.classList.remove('active'); });
+        var goalMap = {'mass':0,'toning_m':1,'toning_f':2,'tennis':3,'soccer':4,'basketball':5};
+        var idx = goalMap[u.goal] || 0;
+        var btns = document.querySelectorAll('.sport-btn');
+        if (btns[idx]) btns[idx].classList.add('active');
+        // סמן ימי אימון
+        tDays = u.days ? u.days.slice() : [];
+        document.querySelectorAll('.day-check').forEach(function(el) { el.classList.remove('selected'); });
+        document.querySelectorAll('.day-check').forEach(function(el, i) {
+            if (tDays.includes(i)) el.classList.add('selected');
+        });
+        switchCard('screen-setup');
+    }
+
+
+    function selectSport(val, el) {
+        document.getElementById('inGoal').value = val;
+        document.querySelectorAll('.sport-btn').forEach(function(btn) { btn.classList.remove('active'); });
+        el.classList.add('active');
+    }
+
+    function goToSetup() {
+        // אם המשתמש כבר מחובר (עריכת הגדרות) - פשוט עבור
+        if (currentUser) { switchCard('screen-setup'); return; }
+        if (!document.getElementById('legalCheck').checked) return alert("אשר הצהרת בריאות.");
+        var em = document.getElementById('regEmail').value.trim().toLowerCase();
+        var pa = document.getElementById('regPass').value;
+        if (!em || !pa) return alert("מלא אימייל וסיסמה.");
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        if (db[em]) return alert("המייל כבר קיים. התחבר.");
+        switchCard('screen-setup');
+    }
+
+    function finishRegister() {
+        if (tDays.length === 0) return alert("בחר ימי אימון.");
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+
+        // עריכת הגדרות למשתמש קיים
+        if (currentUser) {
+            var u = db[currentUser];
+            u.equip = document.getElementById('inEquip').value;
+            u.goal = document.getElementById('inGoal').value;
+            u.dur = parseInt(document.getElementById('inDuration').value);
+            u.days = tDays;
+            db[currentUser] = u;
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            alert("ההגדרות עודכנו! 🚀");
+            renderApp();
+            return;
+        }
+
+        var em = document.getElementById('regEmail').value.trim().toLowerCase();
+        var pa = document.getElementById('regPass').value;
+        var age = parseInt(document.getElementById('regAge').value) || 25;
+        var height = parseInt(document.getElementById('regHeight').value) || 170;
+        var weight = parseInt(document.getElementById('regWeight').value) || 70;
+        db[em] = {
+            pass: pa,
+            age: age,
+            height: height,
+            weight: weight,
+            goal: document.getElementById('inGoal').value,
+            equip: document.getElementById('inEquip').value,
+            dur: parseInt(document.getElementById('inDuration').value),
+            pushups: document.getElementById('inPushups').value,
+            pullups: document.getElementById('inPullups').value,
+            days: tDays,
+            d: 1, wCount: 0, level: 1,
+            start: new Date().getDay(),
+            vip: false, menu: null,
+            history: [], lastReportWeek: -1
+        };
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+        localStorage.setItem(EMAIL_KEY, em);
+        currentUser = em;
+        renderApp();
+    }
+
+    function login() {
+        var em = document.getElementById('loginEmail').value.trim().toLowerCase();
+        var pa = document.getElementById('loginPass').value;
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        if (db[em] && db[em].pass === pa) {
+            localStorage.setItem(EMAIL_KEY, em);
+            currentUser = em;
+            renderApp();
+            checkSunday();
+        } else {
+            alert("אימייל או סיסמה שגויים.");
+        }
+    }
+
+    function checkSunday() {
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        var u = db[currentUser];
+        if (!u) return;
+        var today = new Date();
+        var weekNumber = Math.floor(today.getTime() / (1000 * 60 * 60 * 24 * 7));
+        if (today.getDay() === 0 && u.lastReportWeek !== weekNumber && u.d > 1) {
+            if (!u.history) u.history = [];
+            var last7 = u.history.slice(-7);
+            var hasMenu = u.menu !== null;
+            var workoutScore, menuScore, brainScore, total;
+            if (hasMenu) {
+                workoutScore = (last7.filter(function(h) { return h.workout; }).length / 7) * 40;
+                menuScore = (last7.filter(function(h) { return h.menu; }).length / 7) * 40;
+                brainScore = (last7.filter(function(h) { return h.brain; }).length / 7) * 20;
+            } else {
+                // אין תפריט — חלוקה בין אימונים ומוח בלבד
+                workoutScore = (last7.filter(function(h) { return h.workout; }).length / 7) * 60;
+                menuScore = 0;
+                brainScore = (last7.filter(function(h) { return h.brain; }).length / 7) * 40;
+            }
+            total = Math.round(workoutScore + menuScore + brainScore) || 0;
+            document.getElementById('weeklyScore').innerText = total;
+            var feedback = "";
+            if (last7.length >= 7 && last7.every(function(h) { return h.workout; })) {
+                feedback = "🔥 מפלצת! היית באפליקציה כל יום השבוע!";
+            } else if (total > 80) {
+                feedback = "🌟 עבודה מצוינת! התמדה מרשימה בתפריט ובאימונים.";
+            } else if (total > 50) {
+                feedback = "👍 לא רע, אבל יש מקום לשיפור בשבוע הבא.";
+            } else {
+                feedback = "⚠️ שבוע חלש. תחזור למסלול!";
+            }
+            document.getElementById('weeklyFeedback').innerText = feedback;
+            document.getElementById('updateWeight').value = u.weight || '';
+            document.getElementById('updateHeight').value = u.height || '';
+            document.getElementById('updateAge').value = u.age || '';
+            document.getElementById('sundayModal').style.display = 'flex';
+            u.lastReportWeek = weekNumber;
+            db[currentUser] = u;
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+        }
+    }
+
+    function saveWeeklyUpdate() {
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        var u = db[currentUser];
+        var w = parseFloat(document.getElementById('updateWeight').value);
+        var h = parseFloat(document.getElementById('updateHeight').value);
+        var a = parseInt(document.getElementById('updateAge').value);
+        if (w) u.weight = w;
+        if (h) u.height = h;
+        if (a) u.age = a;
+        db[currentUser] = u;
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+        document.getElementById('sundayModal').style.display = 'none';
+        alert("הנתונים עודכנו! התוכנית הותאמה מחדש.");
+        renderApp();
+    }
+
+    function logoutUser() {
+        if (confirm("⚠️ האם אתה בטוח? כל הנתונים וההתקדמות יימחקו לחלוטין!")) {
+            localStorage.removeItem(EMAIL_KEY);
+            localStorage.removeItem(DB_KEY);
+            location.reload();
+        }
+    }
+
+    function toggleNoMenu() {
+        var area = document.getElementById('menuCheckArea');
+        var link = document.getElementById('noMenuLink');
+        var cb = document.getElementById('menuCheckToday');
+        if (area.style.display === 'none') {
+            area.style.display = 'flex';
+            link.innerText = 'אין לי תפריט';
+            link.style.color = '#666';
+        } else {
+            area.style.display = 'none';
+            cb.checked = false;
+            link.innerText = 'יש לי תפריט — הצג שוב';
+            link.style.color = 'var(--gold)';
+        }
+    }
+
+
+    var restInterval = null;
+
+    function addWater() {
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        var u = db[currentUser];
+        if (!u) return;
+        u.water = (u.water || 0) + 1;
+        if (u.water > 12) u.water = 12;
+        document.getElementById('waterCount').innerText = u.water;
+        db[currentUser] = u;
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+    }
+
+    function getGreeting() {
+        var h = new Date().getHours();
+        if (h >= 5 && h < 12) return "בוקר טוב";
+        if (h >= 12 && h < 18) return "צהריים טובים";
+        if (h >= 18 && h < 22) return "ערב טוב";
+        return "לילה טוב";
+    }
+
+    function formatTime(sec) {
+        var m = Math.floor(sec / 60);
+        var s = sec % 60;
+        return '0' + m + ':' + (s < 10 ? '0' + s : s);
+    }
+
+    function startRestTimer() {
+        clearInterval(restInterval);
+        var time = window._timerSeconds || 60;
+        var display = document.getElementById('timerDisplay');
+        display.style.color = 'var(--tip)';
+        restInterval = setInterval(function() {
+            display.innerText = formatTime(time);
+            time--;
+            if (time < 0) {
+                clearInterval(restInterval);
+                display.innerText = window._timerSeconds > 60 ? '✅ סיימת!' : '💪 חזור לסט!';
+                display.style.color = 'var(--red)';
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            }
+        }, 1000);
+    }
+
+    function closeExModal() {
+        clearInterval(restInterval);
+        window._timerSeconds = 60;
+        var display = document.getElementById('timerDisplay');
+        if (display) { display.innerText = '01:00'; display.style.color = 'var(--tip)'; }
+        var timerLabel = document.querySelector('#timerBox div');
+        if (timerLabel) timerLabel.innerText = '😮‍💨 מנוחה בין סטים:';
+        closeModal('exerciseModal');
+    }
+
+    function openModalById(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function openExModal(title, targets, desc, hideTimer, workTime) {
+        document.getElementById('modalTitle').innerText = title;
+        var tb = document.getElementById('timerBox');
+        if (tb) tb.style.display = hideTimer ? 'none' : 'block';
+        // עדכון הטיימר — עבודה או מנוחה
+        var timerLabel = document.querySelector('#timerBox div');
+        var timerBtn = document.querySelector('#timerBox button');
+        if (workTime && workTime > 0) {
+            if (timerLabel) timerLabel.innerText = '⏱️ זמן עבודה:';
+            if (timerBtn) timerBtn.innerText = '▶️ התחל סט';
+            window._timerSeconds = workTime;
+        } else {
+            if (timerLabel) timerLabel.innerText = '😮‍💨 מנוחה בין סטים:';
+            if (timerBtn) timerBtn.innerText = '▶️ התחל מנוחה';
+            window._timerSeconds = 60;
+        }
+        document.getElementById('timerDisplay').innerText = formatTime(window._timerSeconds || 60);
+        var parts = desc.split('|');
+        var html = '<div style="background:rgba(0,255,204,0.07);padding:10px 14px;border-radius:10px;margin-bottom:12px;border-right:3px solid var(--neon);">' +
+            '<strong style="color:var(--neon);">🎯 שרירי מטרה:</strong><br><span style="color:#fff;">' + targets + '</span></div>';
+        html += '<div style="margin-bottom:12px;"><strong style="color:#fff;">🛠️ איך לבצע:</strong><br><span style="color:#ddd;line-height:1.6;">' + (parts[0] || '') + '</span></div>';
+        if (parts[1]) html += '<div style="background:rgba(0,150,255,0.08);padding:10px 14px;border-radius:10px;margin-bottom:12px;border-right:3px solid var(--tip);">' +
+            '<strong style="color:var(--tip);">🌬️ נשימה:</strong><br><span style="color:#ddd;">' + parts[1] + '</span></div>';
+        if (parts[2]) html += '<div style="background:rgba(255,51,102,0.08);padding:10px 14px;border-radius:10px;border-right:3px solid var(--red);">' +
+            '<strong style="color:var(--red);">⚠️ טעות נפוצה:</strong><br><span style="color:#ddd;">' + parts[2] + '</span></div>';
+        document.getElementById('modalDesc').innerHTML = html;
+        openModalById('exerciseModal');
+    }
+
+    function parseWorkTime(r) {
+        var rLow = r.replace(/\s/g, '').toLowerCase();
+        var minMatch = rLow.match(/([0-9.]+)דק/);
+        var secMatch = rLow.match(/([0-9]+)ש/);
+        if (minMatch) return Math.round(parseFloat(minMatch[1]) * 60);
+        if (secMatch) return parseInt(secMatch[1]);
+        return 0;
+    }
+
+    function exCard(t, s, r, tgt, d, animType) {
+        var visualHtml = "";
+        if (animType) {
+            visualHtml = '<div class="ex-visual-box ' + animType + '">' +
+                '<div class="human-figure">' +
+                '<div class="head"></div><div class="torso"></div>' +
+                '<div class="arm left"></div><div class="arm right"></div>' +
+                '<div class="leg left"></div><div class="leg right"></div>' +
+                '</div></div>';
+        }
+        var safeT = t.replace(/['"]/g, "");
+        var safeTgt = tgt.replace(/['"]/g, "");
+        var safeD = d.replace(/['"]/g, "");
+        var ht = animType ? 'true' : 'false';
+        var wt = parseWorkTime(r);
+        return '<div class="ex-item ' + (animType ? 'ex-item-visual' : '') + '" onclick="openExModal(\'' + safeT + '\',\'' + safeTgt + '\',\'' + safeD + '\',' + ht + ',' + wt + ')">' +
+            visualHtml + '<b>' + t + '</b><span>' + s + ' | ' + r + '</span></div>';
+    }
+
+
+    function getSportDrills(goal) {
+        if (goal === 'tennis') return [
+            {n:"לאנג' צידי מתפרץ 🎾", r:"5 דקות", t:"זריזות מגרש", d:"קפוץ מצד לצד כאילו אתה סוגר פינה.|נשיפה בדחיפה הצידה.|גב עגול."},
+            {n:"רוטציות גו (Russian Twists) 🎾", r:"5 דקות", t:"כוח סיבובי לחבטות", d:"שב נתק רגליים וסובב כתפיים מהר.|נשיפה בסיבוב.|הזזת ידיים בלבד."},
+            {n:"ספרינטים T-Drill 🎾", r:"10 דקות", t:"שינוי כיוון מהיר", d:"רוץ קדימה הצידה וחזרה בשיא המהירות.|נשימה קצבית.|עמידה זקופה מדי."}
+        ];
+        if (goal === 'soccer') return [
+            {n:"ספרינטים ברכיים גבוהות ⚽", r:"7 דקות", t:"סיבולת מהירות", d:"רוץ במקום הכי מהר ברכיים לחזה.|נשימה מהירה.|חוסר קצב."},
+            {n:"קפיצות Skater Jumps ⚽", r:"7 דקות", t:"כוח מתפרץ", d:"קפוץ רחוק הצידה מרגל לרגל.|נשיפה בניתור.|נחיתה קשה."},
+            {n:"פלאנק דינמי ⚽", r:"6 דקות", t:"יציבות אגן", d:"פלאנק הרם רגל ויד נגדית.|נשימה רציפה.|נפילת אגן."}
+        ];
+        if (goal === 'basketball') return [
+            {n:"ניתורים אנכיים (Max Vert) 🏀", r:"7 דקות", t:"כוח ניתור", d:"רד חצי סקוואט וקפוץ לתקרה.|נשיפה אגרסיבית.|ברכיים נעולות."},
+            {n:"שכיבות סמיכה מתפרצות 🏀", r:"6 דקות", t:"כוח מתפרץ ידיים", d:"דחוף את הרצפה ונתק ידיים.|נשיפה בדחיפה.|נחיתה על מרפק נעול."},
+            {n:"סליידים הגנתיים 🏀", r:"7 דקות", t:"עבודת רגליים הגנתית", d:"עמוד נמוך וזוז הצידה מהר הלוך חזור.|נשימה קצבית.|הרמת אגן."}
+        ];
+        return [];
+    }
+
+    function renderApp() {
+        switchCard('screen-app');
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        var u = db[currentUser];
+        if (!u) return;
+
+        // ====== IDs תואמים ל-HTML ======
+        document.getElementById('userHello').innerText = getGreeting() + ", " + currentUser.split('@')[0] + "!";
+        document.getElementById('virtualTime').innerText = weekDays[(u.start + u.d - 1) % 7];
+        document.getElementById('waterCount').innerText = u.water || 0;
+        document.getElementById('dayLabel').innerText = "יום " + u.d;
+        document.getElementById('levelLabel').innerText = "רמה " + u.level;
+        document.getElementById('progressFill').style.width = ((u.d - 1) / 30 * 100) + "%";
+        document.getElementById('progressStat').innerText = "יום " + u.d + " מתוך 30";
+        document.getElementById('dailyTip').innerHTML = '<b>💡 דגש יומי:</b> ' + dailyTipsArray[(u.d - 1) % dailyTipsArray.length];
+
+        var eqLabel = u.equip === "gym" ? "חדר כושר" : (u.equip === "dumbbells" ? "בית + משקולות" : "בית / פארק");
+
+        if (u.menu) {
+            document.getElementById('premiumBtnDisplay').style.display = 'none';
+            document.getElementById('viewPlanBtn').style.display = 'block';
+            document.getElementById('nutritionResultBody').innerHTML = u.menu;
+        }
+
+        var today = (u.start + u.d - 1) % 7;
+        var html = "";
+
+        if (u.days.includes(today)) {
+            var sortedDays = u.days.slice().sort(function(a,b){return a-b;});
+            var dayIndex = sortedDays.indexOf(today);
+            var daysCount = sortedDays.length;
+            var splitType = 'upper';
+            if (daysCount === 1) {
+                splitType = 'full';
+            } else if (daysCount === 3) {
+                splitType = (dayIndex === 1) ? 'lower' : 'upper';
+            } else {
+                splitType = (dayIndex % 2 === 0) ? 'upper' : 'lower';
+            }
+            var isFullBody = splitType === 'full';
+            var isUpper = splitType === 'upper';
+            var zoneLabel = splitType === 'full' ? "פולבאדי 🦾" : (splitType === 'lower' ? "רגליים 🦵" : "עליון 💪");
+            document.getElementById('planInfo').innerText = "אימון: " + u.dur + " דק' | ציוד: " + eqLabel + " | " + zoneLabel;
+            document.getElementById('brainTaskArea').style.display = 'none';
+            document.getElementById('workoutCheckArea').style.display = 'flex';
+
+            html += '<div class="stage-banner banner-warmup">🔥 שלב א\': חימום דינמי 🔥</div>';
+            html += exCard("ג'אמפינג ג'קס", "1 סט", "1 דקה", "העלאת דופק", "קפוץ תוך פישוק רגליים והרמת ידיים מעל הראש. תנועה קצבית ומהירה.", "warmup-anim");
+            html += exCard("סיבובי ידיים ואגן", "1 סט", "1 דקה", "שחרור מפרקים", "תנועות מעגליות גדולות עם הידיים לפנים ולאחור וסיבוב אגן.", "warmup-anim");
+
+            html += '<div class="stage-banner banner-core">⚡ שלב ב\': אימון כוח (' + u.dur + ' דקות) ⚡</div>';
+            var workout = getWorkout(u, isUpper, isFullBody);
+            workout.forEach(function(ex) {
+                html += exCard(ex.n, "סטים עבודה", ex.r, ex.t, ex.d, null);
+            });
+
+            // Sport drills block
+            var sportDrills = getSportDrills(u.goal || 'mass');
+            if (sportDrills.length > 0) {
+                var sportLabel = {'tennis':'🎾 שיפור טניס', 'soccer':'⚽ שיפור כדורגל', 'basketball':'🏀 שיפור כדורסל'}[u.goal] || '';
+                html += '<div class="stage-banner banner-sport">' + sportLabel + ' — 20 דקות ⚡</div>';
+                sportDrills.forEach(function(e) {
+                    html += exCard(e.n, "זמן עבודה", e.r, e.t, e.d, null);
+                });
+            }
+
+            html += '<div class="stage-banner banner-stretch">🧘 שלב ג\': מתיחות קליניות 🧘</div>';
+            html += exCard("מתיחת המסטרינג", "1 סט", "30 שניות", "ירך אחורית וגב תחתון", "עמוד ברגליים ישרות ורד לאט לכיוון קצות האצבעות. החזק סטטי ואל תקפוץ.", "stretch-toe");
+            html += exCard("מתיחת ארבע ראשי", "1 סט", "30 שניות לכל רגל", "קדמת הירך", "עמוד זקוף, קפל רגל לאחור ומשוך קרסול לכיוון הישבן. ברכיים צמודות.", "stretch-quad");
+            html += exCard("מתיחת חזה וכתפיים", "1 סט", "30 שניות", "חזה וכתפיים", "שלב אצבעות מאחורי הגב, ישר מרפקים ודחוף ידיים למעלה. הוצא חזה קדימה.", "stretch-chest");
+
+        } else {
+            document.getElementById('planInfo').innerText = "מנוחה גופנית - יום מוח";
+            document.getElementById('brainTaskArea').style.display = 'flex';
+            document.getElementById('workoutCheckArea').style.display = 'none';
+            var task = eliteBrainTasks[u.d % eliteBrainTasks.length];
+            html += '<div class="stage-banner banner-warmup" style="border-color:var(--level-up);color:var(--level-up);">מנוחה גופנית - יום מוח</div>' +
+                '<div class="ex-item learning-item" onclick="openExModal(\'🧠 ' + task.t.replace(/['"]/g, "") + '\',\'שיפור יכולות קוגניטיביות\',\'' + task.d.replace(/['"]/g, "") + '\')">' +
+                '<b>🧠 ' + task.t + '</b><span>לחץ כאן לקריאת האתגר המלא</span></div>';
+        }
+
+        document.getElementById('workoutArea').innerHTML = html;
+    }
+
+
+    function getWorkout(u, isUpper, isFullBody) {
+        // פולבאדי — שילוב עליון ותחתון בשווה
+        if (isFullBody) {
+            var upper = getWorkout(u, true, false);
+            var lower = getWorkout(u, false, false);
+            var num = u.dur === 30 ? 4 : (u.dur === 60 ? 6 : 10);
+            var half = Math.floor(num / 2);
+            return upper.slice(0, half).concat(lower.slice(0, num - half));
+        }
+        var ex = [];
+        var num = u.dur === 30 ? 4 : (u.dur === 60 ? 6 : 10);
+
+        if (u.equip === "gym") {
+            if (isUpper) {
+                ex = [
+                    {n:"לחיצת חזה עם מוט/משקולות", r:"4x8-10", t:"חזה, יד אחורית, כתף קדמית", d:"שכב על הספסל, רגליים יציבות על הרצפה. הורד את המוט לאמצע החזה ודחוף חזק למעלה.|לקחת אוויר בירידה, להוציא אוויר בדחיפה למעלה.|הקפצת המוט על החזה במקום להוריד בשליטה."},
+                    {n:"פולי עליון (מכונה)", r:"4x10-12", t:"גב רחב (Latissimus Dorsi), יד קדמית", d:"שב במכונה, תפוס את המוט רחב, משוך עד החזה העליון תוך כיווץ השכמות.|להוציא אוויר במשיכה למטה, לקחת אוויר כשמשחררים למעלה.|למשוך את המוט מאחורי העורף במקום לחזה."},
+                    {n:"חתירה במכונה", r:"3x10-12", t:"גב אמצעי, עובי הגב", d:"שב זקוף, משוך את הידיות לכיוון הבטן תוך הצמדת השכמות זו לזו.|להוציא אוויר במשיכה אליך.|להישען יותר מדי אחורה ולהשתמש בתנופה מהגב התחתון."},
+                    {n:"לחיצת כתפיים במכונה/משקולות", r:"3x10", t:"כתף קדמית ואמצעית", d:"שב זקוף, דחוף את המשקולות ישר מעל הראש עד ליישור כמעט מלא.|לקחת אוויר למטה, להוציא אוויר בדחיפה מעל הראש.|הקשתת יתר של הגב התחתון בגלל משקל כבד מדי."},
+                    {n:"כפיפת מרפקים משקולות", r:"3x12", t:"יד קדמית (Biceps)", d:"עמוד זקוף. הרם את המשקולות לכיוון הכתף, כווץ חזק והורד לאט.|להוציא אוויר בעלייה, לקחת אוויר בירידה.|התנדנדות עם הגוף כדי לעזור להרים את המשקל."},
+                    {n:"פשיטת מרפקים בכבל", r:"3x12", t:"יד אחורית (Triceps)", d:"הצמד את המרפקים לצלעות, דחוף את הכבל מטה עד שהידיים ישרות לגמרי.|להוציא אוויר בדחיפה מטה.|הזזת המרפקים קדימה ואחורה במקום לשמור אותם צמודים."},
+                    {n:"פרפר במכונה (Pec Deck)", r:"3x15", t:"חזה (בידוד)", d:"שב במכונה, סגור את הידיים בתנועת חיבוק למרכז וכווץ את החזה.|להוציא אוויר בזמן סגירת הידיים.|כיפוף מוגזם של המרפקים שהופך את זה ללחיצה."},
+                    {n:"הרחקת כתפיים משקולות", r:"3x15", t:"כתף צידית", d:"הרם משקולות לצדדים עד גובה הכתף, מרפקים טיפה כפופים.|להוציא אוויר בהרמה.|הרמת הכתפיים (הטרפזים) לאוזניים במקום להרים מהכתף."},
+                    {n:"כפיפות בטן במכונה", r:"4x15", t:"שרירי הבטן", d:"החזק בידיות והתקפל קדימה בעזרת כיווץ הבטן ולא משיכת הידיים.|להוציא אוויר חזק בירידה.|למשוך את המשקל בעזרת הידיים והצוואר ולא מהבטן."},
+                    {n:"פלאנק", r:"3x1 דקה", t:"שרירי הליבה", d:"הישען על האמות, גב ישר. שמור על בטן וישבן מכווצים.|נשימה רציפה וקצרה לאורך כל הדקה. לא לעצור אוויר!|נפילת האגן למטה או הרמת הישבן גבוה מדי."}
+                ];
+            } else {
+                ex = [
+                    {n:"לחיצת רגליים (Leg Press)", r:"4x10-12", t:"ארבע ראשי, ישבן", d:"שב במכונה. רד מבוקר עד לזווית של 90 מעלות בברך, ודחוף חזרה ממשקל העקבים.|לקחת אוויר בירידה, להוציא אוויר בדחיפה.|נעילת הברכיים (יישור מוחלט) בסוף התנועה - סכנה למפרק!"},
+                    {n:"סקוואט עם משקולת (Goblet Squat)", r:"4x10", t:"ארבע ראשי, ישבן", d:"החזק משקולת צמודה לחזה. רד ישר למטה כאילו אתה מתיישב על כיסא, כשהברכיים מצביעות החוצה.|לקחת אוויר בירידה, להוציא אוויר חזק בעלייה.|קריסת הברכיים פנימה בזמן העלייה."},
+                    {n:"פשיטת ברכיים במכונה", r:"3x12", t:"ארבע ראשי (בידוד)", d:"שב במכונה ויישר את הרגליים קדימה עד לכיווץ מלא של השריר בקדמת הירך.|להוציא אוויר ביישור הרגליים.|תנופה מהירה במקום תנועה נשלטת."},
+                    {n:"כפיפת ברכיים במכונה", r:"3x12", t:"המסטרינג (ירך אחורית)", d:"שב במכונה, כופף את הרגליים לכיוון הישבן נגד ההתנגדות.|להוציא אוויר במשיכת המשקל לישבן.|הרמת הישבן והתנתקות מהספסל בזמן המשיכה."},
+                    {n:"דדליפט רומני עם משקולות (RDL)", r:"3x10", t:"ירך אחורית וגב תחתון", d:"רגליים כמעט ישרות. דחוף את הישבן לאחור והורד את המשקולות לאורך הרגל עד שתרגיש מתיחה.|לקחת אוויר בירידה, להוציא אוויר בעלייה.|עיגול הגב התחתון בירידה במקום לשמור עליו ישר."},
+                    {n:"עליית תאומים", r:"4x15-20", t:"שוקיים", d:"עמוד על קצה מדרגה או במכונה, רד למתיחה מלאה ודחוף גבוה לקצות האצבעות.|להוציא אוויר בעלייה.|ביצוע תנועות קופצניות במקום טווחי תנועה מלאים."},
+                    {n:"לאנג'ים עם משקולות", r:"3x12 לכל רגל", t:"רגליים, ישבן ויציבות", d:"צעד גדול קדימה. רד עד שהברך האחורית כמעט נוגעת ברצפה, ודחוף חזרה לעמידה.|לקחת אוויר בירידה, להוציא אוויר בדחיפה אחורה.|נפילת פלג הגוף העליון קדימה במקום להישאר זקוף."},
+                    {n:"היפ-טראסט (דחיקת אגן)", r:"3x12", t:"ישבן (Glutes)", d:"שב כשהשכמות על ספסל. הנח משקולת על האגן. דחוף את האגן לתקרה דרך העקבים וכווץ ישבן.|לקחת אוויר למטה, להוציא אוויר חזק בדחיפה למעלה.|דחיפה דרך קצות האצבעות במקום מהעקבים."},
+                    {n:"הרחקת ירכיים במכונה", r:"3x15", t:"ירך חיצונית", d:"שב במכונה ופתח את הרגליים החוצה נגד ההתנגדות.|להוציא אוויר בפתיחה של הרגליים.|שחרור מהיר של המשקל חזרה ללא התנגדות שלילית."},
+                    {n:"קירוב ירכיים במכונה", r:"3x15", t:"ירך פנימית (אדוקטורים)", d:"שב במכונה וסגור את הרגליים פנימה נגד ההתנגדות.|להוציא אוויר בסגירה.|משקל גבוה מדי שלא מאפשר טווח תנועה מלא."}
+                ];
+            }
+        } else if (u.equip === "dumbbells") {
+            if (isUpper) {
+                ex = [
+                    {n:"לחיצת חזה משקולות על הרצפה", r:"4x10", t:"חזה, יד אחורית", d:"שכב על הגב. דחוף את המשקולות למעלה. כשהמרפקים נוגעים ברצפה בירידה, דחוף שוב.|לקחת אוויר כשהמרפק יורד, להוציא בדחיפה.|הטחת המרפקים ברצפה במקום להניח בעדינות."},
+                    {n:"חתירה בהטיית גו עם משקולות", r:"4x10", t:"גב אמצעי, רחב גבי", d:"התכופף קדימה עם גב ישר לגמרי. משוך את המשקולות מהרצפה לכיוון המותניים.|להוציא אוויר במשיכת המשקולות למעלה.|משיכת המשקולות לחזה במקום למותן."},
+                    {n:"לחיצת כתפיים משקולות", r:"3x10", t:"כתף קדמית ואמצעית", d:"בעמידה, דחוף את המשקולות מעל הראש.|לקחת אוויר בירידה, להוציא בדחיפה.|דחיפת המשקולות קדימה במקום ממש מעל הראש."},
+                    {n:"כפיפת מרפקים משקולות", r:"3x12", t:"יד קדמית (Biceps)", d:"החזק משקולות בצידי הגוף, כופף מרפקים והרם לכתף. סובב מעט את כף היד בשיא.|להוציא אוויר בעלייה.|הזזת המרפקים קדימה כדי להקל על ההרמה."},
+                    {n:"פשיטת מרפקים מאחורי הראש", r:"3x12", t:"יד אחורית (Triceps)", d:"אחוז משקולת אחת בשתי הידיים מאחורי הראש, יישר אותה כלפי מעלה.|להוציא אוויר בזמן יישור הידיים.|המרפקים בורחים לצדדים במקום להישאר קרובים לאוזניים."},
+                    {n:"הרחקת כתפיים", r:"3x15", t:"כתף צידית", d:"עמוד זקוף והרם את המשקולות הצידה עד קו הכתף.|להוציא אוויר בעלייה הצידה.|שימוש בתנופת גוף מלאה במקום לבודד את הכתף."},
+                    {n:"שכיבות סמיכה", r:"3xMAX", t:"חזה, טרייספס", d:"רד עם החזה לרצפה ודחוף. אפשר על ברכיים אם צריך.|לקחת אוויר בירידה, להוציא בדחיפה.|מרפקים פתוחים מדי (90 מעלות) במקום 45 מעלות מהגוף."},
+                    {n:"שראגס (משיכת כתפיים)", r:"3x15", t:"טרפזים עליונים", d:"החזק משקולות בצידי הגוף, משוך כתפיים לכיוון האוזניים והורד לאט.|להוציא אוויר בכיווץ למעלה.|סיבוב הכתפיים בתנועה מעגלית."},
+                    {n:"כפיפות בטן", r:"3x20", t:"שרירי בטן", d:"שכב על הרצפה, התקפל קדימה וכווץ בטן.|להוציא אוויר בעלייה.|משיכת הצוואר עם הידיים במקום לעלות מהבטן."},
+                    {n:"פלאנק", r:"3x1 דקה", t:"ליבה", d:"החזק גוף ישר על האמות.|לנשום כרגיל, לא לעצור אוויר.|נפילת האגן מטה."}
+                ];
+            } else {
+                ex = [
+                    {n:"סקוואט עם משקולת (Goblet Squat)", r:"4x10", t:"ארבע ראשי, ישבן", d:"החזק משקולת צמודה לחזה. רד לסקוואט כאילו אתה מתיישב על כיסא נמוך.|לקחת אוויר בירידה, להוציא בעלייה.|קריסת ברכיים פנימה."},
+                    {n:"דדליפט רומני משקולות (RDL)", r:"4x10", t:"המסטרינג, ישבן", d:"דחוף אגן לאחור עם רגליים כמעט ישרות ורד עם המשקולות על השוקיים.|לקחת אוויר בירידה, להוציא בעלייה.|עיגול גב תחתון."},
+                    {n:"לאנג'ים עם משקולות", r:"3x12 לכל רגל", t:"רגליים וישבן", d:"צעד גדול קדימה. רד עד שהברך האחורית כמעט נוגעת ברצפה, ודחוף חזרה.|לקחת אוויר בירידה, להוציא בדחיפה אחורה.|נפילת החזה קדימה."},
+                    {n:"סקוואט בולגרי (רגל על כיסא)", r:"3x10 לכל רגל", t:"רגליים (בידוד חד צדדי)", d:"הנח רגל אחת אחורית על כיסא, משקולות בידיים. רד לאט ודחוף.|לקחת אוויר בירידה, להוציא בעלייה.|מיקום קרוב מדי לכיסא שלא מאפשר ירידה עמוקה."},
+                    {n:"היפ טראסט על הרצפה עם משקולת", r:"3x15", t:"ישבן מבודד", d:"שכב על הגב, הנח משקולת על האגן. דחוף למעלה דרך העקבים וכווץ ישבן.|להוציא אוויר בדחיפה.|דחיפה דרך האצבעות."},
+                    {n:"עליית תאומים עם משקולות", r:"4x20", t:"שוקיים", d:"עמוד עם משקולות ועלה על קצות האצבעות לאט.|להוציא אוויר בעלייה.|לעשות את זה מהר מדי."},
+                    {n:"סווינג (הנפת) משקולת", r:"3x15", t:"שרשרת אחורית", d:"אחוז משקולת אחת, דחוף אגן אחורה והתפוצץ קדימה כדי להניף אותה.|להוציא אוויר חזק כשהמשקולת עפה למעלה.|לעשות סקוואט במקום הינג' (דחיפת אגן לאחור)."},
+                    {n:"גשר ישבן רגל אחת", r:"3x12 לכל רגל", t:"ישבן, אלכסונים", d:"כמו היפ טראסט רק שרגל אחת ישרה באוויר.|להוציא אוויר בעלייה.|הטיית האגן הצידה."},
+                    {n:"הליכת איכרים", r:"3x45 שניות", t:"ליבה, אחיזה", d:"החזק משקולות כבדות בשני הצדדים ולך ישר ובגב זקוף.|נשימה רגילה.|ללכת מהר מדי ולהתנדנד."},
+                    {n:"קפיצות פישוק פינישר", r:"3 דקות", t:"אירובי", d:"קפוץ לפישוק תוך הרמת ידיים מעל הראש בקצב מהיר.|נשימה מהירה ורציפה.|לוותר באמצע!"}
+                ];
+            }
+        } else {
+            // בית - משקל גוף
+            if (isUpper) {
+                ex = [
+                    {n:"שכיבות סמיכה", r:"4x10-15", t:"חזה, יד אחורית", d:"ידיים ברוחח כתפיים. רד עד שהחזה נוגע ברצפה ודחוף. קשה? שים ברכיים ברצפה.|לקחת אוויר בירידה, להוציא חזק בדחיפה.|זווית מרפקים פתוחה מדי (כמו T) במקום חץ כלפי מטה."},
+                    {n:"חתירה מתחת לשולחן", r:"4x10", t:"גב רחב", d:"שכב מתחת לשולחן יציב, אחוז בקצה ומשוך את החזה לשולחן.|להוציא אוויר במשיכה למעלה.|למשוך מהבטן במקום לעבוד עם שרירי הגב."},
+                    {n:"שכיבות סמיכה פייק", r:"3x10", t:"כתפיים", d:"העמד גוף בצורת V הפוך. רד עם הראש לכיוון הרצפה בין הידיים ודחוף.|לקחת אוויר בירידה, להוציא בעלייה.|לרדת קדימה מדי במקום בקו ישר בין הידיים."},
+                    {n:"מטבלים (Dips) על כיסא", r:"3x12", t:"יד אחורית (Triceps)", d:"ידיים על קצה הכיסא מאחוריך. רד למטה עד זווית 90 במרפק ודחוף.|לקחת אוויר בירידה, להוציא בדחיפה.|התרחקות עם האגן מהכיסא שיוצרת לחץ על הכתף."},
+                    {n:"שכיבות סמיכה יהלום", r:"3x10", t:"יד אחורית, חזה פנימי", d:"הצמד אגודלים ואצבעות לצורת יהלום. עשה שכיבת סמיכה.|לקחת בירידה, להוציא בעלייה.|לעשות חצי תנועה כי קשה. עדיף על ברכיים אבל תנועה מלאה."},
+                    {n:"סופרמן", r:"3x15", t:"זוקפי גב", d:"שכב על הבטן, הרם ידיים ורגליים ישרות מהרצפה בו זמנית.|להוציא אוויר בעלייה.|מבט מורם למעלה במקום להסתכל לרצפה."},
+                    {n:"פלאנק", r:"3x1 דקה", t:"ליבה", d:"החזק את הגוף על האמות ישר כמו קרש.|נשימה רגילה, לא לעצור אוויר.|נפילת האגן מטה."},
+                    {n:"כפיפות בטן", r:"4x20", t:"ישר בטני", d:"שכב על הגב, רגליים על הרצפה, והתקפל למעלה מהבטן.|להוציא אוויר חזק למעלה.|למשוך את הצוואר עם הידיים."},
+                    {n:"מטפס הרים", r:"3x45 שניות", t:"אירובי, ליבה", d:"מצב שכיבות סמיכה, משוך ברכיים לחזה בקצב של ריצה.|נשימה מהירה ורציפה.|הקפצת הישבן למעלה במקום להישאר מאוזן."},
+                    {n:"ברפיז (Burpees)", r:"3x10", t:"כל הגוף, אירובי", d:"רד לשכיבת סמיכה, קפוץ לעמידה והתרומם לקפיצה קטנה באוויר.|לנשום עמוק מתי שאפשר.|לדלג על השכיבת סמיכה בתחתית."}
+                ];
+            } else {
+                ex = [
+                    {n:"סקוואט (משקל גוף)", r:"4x20", t:"ארבע ראשי, ישבן", d:"רד למטה כאילו אתה מתיישב על כיסא דמיוני. שמור חזה זקוף.|לקחת אוויר בירידה, להוציא בעלייה.|קריסת ברכיים פנימה."},
+                    {n:"לאנג'ים מתחלפים", r:"4x10 לכל רגל", t:"רגליים וישבן", d:"צעד קדימה עד שהברך האחורית קרובה לרצפה. דחוף חזרה ועבור רגל.|לקחת בירידה, להוציא בדחיפה.|צעד צר מדי."},
+                    {n:"היפ טראסט על הרצפה", r:"4x20", t:"ישבן", d:"שכב על הגב, ברכיים כפופות. דחוף אגן לתקרה ככל האפשר וכווץ ישבן.|להוציא אוויר חזק בדחיפה.|דחיפה מקצות האצבעות במקום העקבים."},
+                    {n:"לאנג'ים לאחור", r:"3x12 לכל רגל", t:"המסטרינג וישבן", d:"אותו דבר כמו לאנג' רגיל, רק שהצעד הוא אחורה. מצוין לברכיים רגישות.|לקחת בירידה, להוציא בעלייה.|נפילת הגוף קדימה."},
+                    {n:"סקוואט קפיצה", r:"3x15", t:"כוח מתפרץ ברגליים", d:"רד לסקוואט והתפוצץ למעלה לקפיצה באוויר. נחת ברכות ישר לסקוואט הבא.|להוציא אוויר חזק בקפיצה.|נחיתה נוקשה על רגליים ישרות."},
+                    {n:"הרחקת רגל בעמידת שש", r:"3x20 לכל רגל", t:"ישבן צידי", d:"רד לעמידת שש. הרם ברך אחת הצידה כמו כלב.|להוציא אוויר בהרמה הצידה.|סיבוב כל האגן במקום רק להרים את הרגל."},
+                    {n:"גוד מורנינג ידיים בראש", r:"3x15", t:"המסטרינג", d:"ידיים מאחורי הראש, רגליים ישרות. התכופף קדימה מהמותן בלבד עד שתרגיש מתיחה.|לקחת בירידה, להוציא בעלייה.|עיגול הגב."},
+                    {n:"עליית תאומים על מדרגה", r:"4x20", t:"שוקיים", d:"עמוד על קצה מדרגה. רד נמוך עם העקב ודחוף גבוה למעלה.|להוציא אוויר בעלייה.|תנועות מהירות מדי ללא השהייה למעלה."},
+                    {n:"פלאנק צידי", r:"3x30 שניות לכל צד", t:"אלכסוני הבטן", d:"שכב על הצד והרם אגן כך שהגוף מהווה קו ישר מהראש לרגליים.|נשימה רגילה.|לתת לאגן ליפול למטה."},
+                    {n:"קפיצות פישוק פינישר", r:"3 דקות", t:"אירובי", d:"קפוץ מפישוק לעמידה צמודה תוך כדי תנועת ידיים מלאה מעל הראש.|לנשום רציף.|לקפוץ בלי להזיז את הידיים."}
+                ];
+            }
+        }
+        // חיטוב נשים — מוסיף תרגילי ישבן ורגליים במקום תרגילי כוח עליון
+        if (u.goal === 'toning_f') {
+            if (isUpper) {
+                // עליון לנשים — כתפיים, גב עליון, בטן
+                ex = [
+                    {n:"פרפר בכבלים / משקולות", r:"3x15", t:"חזה עליון מותאם לנשים", d:"תנועת חיבוק רחבה ועדינה.|להוציא בסגירה.|כיפוף מרפקים."},
+                    {n:"חתירה בכבל / משקולות", r:"3x15", t:"גב עליון וטרפזים", d:"משוך ידיות לחזה בשליטה.|להוציא במשיכה.|תנופה מהגב."},
+                    {n:"הרחקת כתפיים קלה", r:"3x15", t:"כתפיים עדינות", d:"הרם משקולות קלות הצידה.|להוציא בעלייה.|משקל כבד מדי."},
+                    {n:"כפיפות בטן", r:"4x20", t:"בטן עליונה", d:"התקפל ממש מהבטן.|להוציא בעלייה.|משיכת הצוואר."},
+                    {n:"פלאנק", r:"3x45 שניות", t:"ליבה וחגורת בטן", d:"גוף ישר על האמות.|נשימה רציפה.|נפילת האגן."},
+                    {n:"מתיחת יד אחורית (Tricep Kickback)", r:"3x15", t:"יד אחורית", d:"יישר יד לאחור בשליטה.|להוציא ביישור.|הזזת המרפק."},
+                    {n:"Russian Twists", r:"3x20", t:"אלכסוני הבטן", d:"שב נתק רגליים וסובב כתפיים.|להוציא בסיבוב.|הזזת ידיים בלבד."},
+                    {n:"שכיבות סמיכה על הברכיים", r:"3xMAX", t:"חיטוב חזה ויד אחורית", d:"רד לאט ודחוף בשליטה.|להוציא בדחיפה.|מרפקים פתוחים מדי."},
+                    {n:"כפיפות בטן תחתונות", r:"3x15", t:"בטן תחתונה", d:"שכב הרם רגליים ישרות למעלה.|להוציא בעלייה.|תנופה."},
+                    {n:"פלאנק צידי", r:"3x30 שניות", t:"אלכסונים", d:"גוף ישר על הצד.|נשימה רגילה.|נפילת האגן."}
+                ];
+            } else {
+                // תחתון לנשים — דגש על ישבן, ירכיים, שוקיים
+                ex = [
+                    {n:"היפ טראסט כבד", r:"4x15", t:"ישבן מבודד", d:"דחוף אגן חזק לתקרה וכווץ בשיא.|להוציא בדחיפה.|דחיפה מהאצבעות."},
+                    {n:"סקוואט סומו (רגליים רחבות)", r:"4x15", t:"ישבן וירך פנימית", d:"רגליים רחבות ואצבעות החוצה, רד עמוק.|להוציא בעלייה.|ברכיים קורסות פנימה."},
+                    {n:"לאנג'ים לאחור", r:"3x12 לכל רגל", t:"ישבן וירך קדמית", d:"צעד לאחור ורד עמוק.|להוציא בדחיפה.|נפילת החזה קדימה."},
+                    {n:"Donkey Kicks (בעיטות ישבן)", r:"3x20 לכל רגל", t:"ישבן עליון נקודתי", d:"בעמידת שש בעט רגל לתקרה.|להוציא בבעיטה.|סיבוב האגן."},
+                    {n:"קירוב ירכיים במכונה", r:"3x20", t:"ירך פנימית", d:"סגור רגליים מבוקר נגד ההתנגדות.|להוציא בסגירה.|תנועה מהירה."},
+                    {n:"הרחקת ירכיים (מכונה / כבל)", r:"3x20", t:"ירך חיצונית וישבן צידי", d:"פתח רגליים נגד ההתנגדות.|להוציא בפתיחה.|תנופה."},
+                    {n:"עליות תאומים על מדרגה", r:"4x20", t:"שוקיים", d:"עמוד על קצה מדרגה ועלה גבוה.|להוציא בעלייה.|תנועות מהירות."},
+                    {n:"גשר ישבן רגל אחת", r:"3x12 לכל רגל", t:"ישבן ואלכסונים", d:"דחוף אגן כשרגל אחת באוויר.|להוציא בדחיפה.|הטיית האגן."},
+                    {n:"פלאנק עם הרמת רגל", r:"3x10 לכל רגל", t:"ישבן וליבה", d:"פלאנק הרם רגל ישרה לגובה הישבן.|נשימה רציפה.|קריסת האגן."},
+                    {n:"הליכה בסרט עם מיניבנד", r:"3x45 שניות", t:"ירך חיצונית וישבן", d:"פיסוק עם גומייה סביב הברכיים, צעד הצידה.|נשימה רגילה.|צעד צר מדי."}
+                ];
+            }
+        }
+
+        return ex.slice(0, num);
+    }
+
+
+    function prevDay() {
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        var u = db[currentUser];
+        if (!u) return;
+        if (u.d === 1 && u.level === 1) { alert("אתה ביום הראשון, אין לאן לחזור!"); return; }
+        var prevDayIdx = (u.start + u.d - 2 + 7) % 7;
+        if (u.days.includes(prevDayIdx) && u.wCount > 0) u.wCount--;
+        if (u.d === 1) { u.level = Math.max(1, (u.level || 1) - 1); u.d = 30; }
+        else { u.d--; }
+        if (!u.history) u.history = [];
+        if (u.history.length > 0) u.history.pop();
+        u.water = 0;
+        db[currentUser] = u;
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+        renderApp(); window.scrollTo(0, 0);
+    }
+
+    function completeDay() {
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        var u = db[currentUser];
+        if (!u) return;
+        if (!u.history) u.history = [];
+        var menuFollowed = document.getElementById('menuCheckToday').checked;
+        var workoutDone = document.getElementById('workoutCheckToday') ? document.getElementById('workoutCheckToday').checked : false;
+        var brainDone = document.getElementById('brainCheckToday').checked;
+        var today = (u.start + u.d - 1) % 7;
+        if (u.days.includes(today)) {
+            u.wCount++; // תמיד מתקדם — עליון/תחתון לסירוגין
+            u.history.push({ day: u.d, menu: menuFollowed, workout: workoutDone, brain: false });
+        } else {
+            u.history.push({ day: u.d, menu: menuFollowed, workout: false, brain: brainDone });
+        }
+        u.d++;
+        if (u.d > 30) { u.level++; u.d = 1; alert("כל הכבוד! עלית רמה! 🏆"); }
+        db[currentUser] = u;
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+        u.water = 0;
+        document.getElementById('menuCheckToday').checked = false;
+        document.getElementById('brainCheckToday').checked = false;
+        if (document.getElementById('workoutCheckToday')) document.getElementById('workoutCheckToday').checked = false;
+        renderApp();
+        window.scrollTo(0, 0);
+    }
+
+    function verifyPremiumCode() {
+        if (document.getElementById('vipCodeInput').value.trim().toUpperCase() === "LUPU2026") {
+            var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+            db[currentUser].vip = true;
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            closeModal('unlockModal');
+            openModalById('nutritionSetupModal');
+        } else alert("קוד שגוי!");
+    }
+
+    function generateNutritionPlan() {
+        var db = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        var u = db[currentUser];
+        var act = parseFloat(document.getElementById('nutActivity').value);
+        var algStr = (document.getElementById('nutAllergies').value || '').toLowerCase();
+        var bmr = (10 * u.weight) + (6.25 * u.height) - (5 * u.age) + 5;
+        var cals = Math.round(bmr * act);
+        var finalCals = u.goal === 'mass' ? cals + 300 : cals - 300;
+        var prot = Math.round(u.weight * 2);
+
+        // מאגרי מזון
+        var p_morn = ["3 ביצים קשות", "150ג טופו מקושקש", "יוגורט חלבון", "דייסת שיבולת שועל עם אבקת חלבון", "2 ביצי עין"];
+        var c_morn = ["2 פרוסות לחם מלא", "3 פריכיות אורז", "לחם ללא גלוטן", "שיבולת שועל"];
+        var f_morn = ["חצי אבוקדו", "כף טחינה", "חמאת בוטנים", "שקדים"];
+        var p_lunch = ["200ג חזה עוף צלוי", "פילה דג אפוי", "200ג טופו מוקפץ", "סייטן צלוי", "200ג בקר רזה", "קציצות עדשים"];
+        var c_lunch = ["1.5 כוסות אורז בסמטי", "קינואה", "פסטה מחיטה מלאה", "פסטה ללא גלוטן", "2 תפוחי אדמה", "בטטה גדולה"];
+        var p_din = ["גביע קוטג 5%", "טונה במים", "150ג טופו", "2 ביצים קשות", "חביתה מ-2 ביצים", "עדשים שחורות", "גבינה צפתית 5%"];
+        var f_din = ["כף שמן זית", "טחינה גולמית", "חופן אגוזי מלך", "חופן זיתים"];
+
+        // סינון קטגוריות
+        var isVegan = algStr.includes("טבעונ");
+        var isVeg = isVegan || algStr.includes("צמחונ") || algStr.includes("בשר");
+        var noDairy = isVegan || algStr.includes("חלב") || algStr.includes("לקטוז") || algStr.includes("קוטג") || algStr.includes("יוגורט");
+        var noEggs = isVegan || algStr.includes("ביצ");
+        var noFish = isVeg || algStr.includes("דג") || algStr.includes("טונה");
+        var noGluten = algStr.includes("גלוטן") || algStr.includes("צליאק");
+
+        if (noEggs) { p_morn = p_morn.filter(function(x){return !x.includes("ביצ");}); p_din = p_din.filter(function(x){return !x.includes("ביצ");}); }
+        if (noDairy) { p_morn = p_morn.filter(function(x){return !x.includes("יוגורט");}); p_din = p_din.filter(function(x){return !x.includes("קוטג") && !x.includes("גבינה");}); }
+        if (noGluten) { c_morn = c_morn.filter(function(x){return !x.includes("לחם מלא");}); c_lunch = c_lunch.filter(function(x){return !x.includes("פסטה מחיטה");}); }
+        if (isVeg) p_lunch = p_lunch.filter(function(x){return !x.includes("עוף") && !x.includes("בקר");});
+        if (noFish) { p_lunch = p_lunch.filter(function(x){return !x.includes("דג");}); p_din = p_din.filter(function(x){return !x.includes("טונה");}); }
+
+        // סינון דינמי לפי מילים
+        var algWords = algStr.split(/[\s,]+/);
+        var filterArray = function(arr) {
+            return arr.filter(function(item) {
+                for (var i = 0; i < algWords.length; i++) {
+                    if (algWords[i].length > 2 && item.includes(algWords[i])) return false;
+                }
+                return true;
+            });
+        };
+        p_morn = filterArray(p_morn); c_morn = filterArray(c_morn); f_morn = filterArray(f_morn);
+        p_lunch = filterArray(p_lunch); c_lunch = filterArray(c_lunch);
+        p_din = filterArray(p_din); f_din = filterArray(f_din);
+
+        var getRand = function(arr, fallback) { return arr.length > 0 ? arr[Math.floor(Math.random()*arr.length)] : fallback; };
+
+        var m1 = getRand(p_morn, "מקור חלבון") + " + " + getRand(c_morn, "פחמימה בריאה") + " + " + getRand(f_morn, "שומן בריא") + ".";
+        var m2 = getRand(p_lunch, "חלבון עיקרי") + " + " + getRand(c_lunch, "פחמימה חמה") + " + סלט ירקות.";
+        var m3 = getRand(p_din, "חלבון קל") + " + " + getRand(f_din, "שמן זית") + " + ירקות חתוכים.";
+
+        var goalText = u.goal === 'mass' ? "מסה" : (u.goal === 'toning_m' || u.goal === 'toning_f' || u.goal === 'toning' ? "חיטוב" : "ספורטאי");
+
+        var html = '<div style="text-align:center;margin-bottom:20px;">' +
+            '<b style="color:var(--neon);font-size:22px;display:block;">' + finalCals + ' קק"ל ביום</b>' +
+            '<span style="color:#aaa;font-size:14px;">יעד חלבון יומי: ' + prot + ' גרם (' + goalText + ')</span></div>';
+
+        html += '<div class="meal-box"><h3>🍳 בוקר</h3><p style="color:#ddd;">' + m1 + '</p></div>';
+        html += '<div class="meal-box"><h3>🍗 צהריים</h3><p style="color:#ddd;">' + m2 + '</p></div>';
+        html += '<div class="meal-box"><h3>🥗 ערב</h3><p style="color:#ddd;">' + m3 + '</p></div>';
+        html += '<p style="color:#aaa;font-size:12px;text-align:center;margin-top:10px;">* ניתן לרענן לקבלת שילוב שונה 🔄</p>';
+
+        u.menu = html;
+        db[currentUser] = u;
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+        closeModal('nutritionSetupModal');
+        document.getElementById('nutritionResultBody').innerHTML = html;
+        openModalById('nutritionResultModal');
+        renderApp();
+    }
+</script>
+
+</body>
+</html>
